@@ -8,7 +8,7 @@ echo "safety (failure is tolerated)"
 poetry run pip freeze | poetry run safety check --stdin
 
 echo "pylint"
-pylint src || FAILURE=true
+PYTHONPATH=. pylint src || FAILURE=true
 
 echo "pycodestyle"
 pycodestyle src || FAILURE=true

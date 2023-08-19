@@ -17,7 +17,6 @@ def test_data_fixture(tmpdir):
     return url, save_path
 
 
-# Test the download_zip_file function
 def test_download_zip_file(test_data):
     url, save_path = test_data
 
@@ -28,11 +27,9 @@ def test_download_zip_file(test_data):
         mock_response.status_code = 200
         mock_response.iter_content.return_value = [response_content]
 
-        # Perform the download
         download_zip_file(url, save_path)
 
-    # Check if the file was downloaded and its content
+  
     assert os.path.exists(save_path)
-
     with open(save_path, "rb") as f:
         assert f.read() == response_content

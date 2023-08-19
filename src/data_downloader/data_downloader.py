@@ -1,3 +1,4 @@
+import os
 import zipfile
 
 import requests
@@ -5,6 +6,10 @@ import requests
 
 def download_zip_file(url, save_path):
     """Download a ZIP file from a URL and save it to a local path."""
+    save_dir = save_path.rsplit("/", 1)[0]
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
     response = requests.get(url, stream=True, timeout=5)
     if response.status_code == 200:
         with open(save_path, "wb") as f:

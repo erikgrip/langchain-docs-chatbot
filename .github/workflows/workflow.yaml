@@ -13,9 +13,6 @@ jobs:
         - name: Get full Python version
           id: full-python-version
           run: echo version=$(python -c "import sys; print('-'.join(str(v) for v in sys.version_info))")
-        
-        - name: Set python path
-          run: export PYTHONPATH=.
             
         - name: Bootstrap poetry
           run: |
@@ -46,4 +43,4 @@ jobs:
         - name: Install dependencies
           run: poetry install --with dev
 
-        - run: poetry run pytest
+        - run: PYTHONPATH=. poetry run pytest

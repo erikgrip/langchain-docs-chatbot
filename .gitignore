@@ -1,6 +1,7 @@
 ### Project Settings ###
 .python-version
 
+data/
 .vscode/
 
 ### Deafault Settings ###

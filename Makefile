@@ -35,10 +35,10 @@ tensorboard:
 
 # Testing and linting
 lint:
-	tasks/lint.sh
+	poetry run tasks/lint.sh
 
 test:
-	PYTHONPATH=. pytest -s .
+	PYTHONPATH=. poetry run pytest -s .
 
 
 # Tmp

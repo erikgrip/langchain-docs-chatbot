@@ -14,7 +14,7 @@ echo "pycodestyle"
 pycodestyle src || FAILURE=true
 
 echo "pydocstyle"
-pydocstyle src|| FAILURE=true
+pydocstyle src || FAILURE=true
 
 echo "mypy"
 mypy src || FAILURE=true

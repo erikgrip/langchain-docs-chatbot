@@ -3,6 +3,8 @@ import zipfile
 
 import requests
 
+from src.utils.log import logger
+
 
 def download_zip_file(url, save_path):
     """Download a ZIP file from a URL and save it to a local path."""
@@ -15,8 +17,9 @@ def download_zip_file(url, save_path):
         with open(save_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
+            logger.info("Downloaded zip file to %s directory.", save_dir)
     else:
-        print(f"Failed to download the ZIP file. Status code: {response.status_code}")
+        logger.error("Failed to download the zip file: %s", response.status_code)
 
 
 def extract_files_by_extension(zip_file_path, target_extensions, output_dir):

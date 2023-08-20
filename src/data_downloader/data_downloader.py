@@ -17,7 +17,7 @@ def download_zip_file(url, save_path):
         with open(save_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
-            logger.info("Downloaded zip file to %s directory.", save_dir)
+            logger.info("Downloaded zip file to %s directory", save_dir)
     else:
         logger.error("Failed to download the zip file: %s", response.status_code)
 

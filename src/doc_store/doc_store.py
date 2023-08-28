@@ -1,16 +1,28 @@
+import os
 from glob import glob
+
+from dotenv import load_dotenv
 from langchain.document_loaders.base import BaseLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import (MarkdownHeaderTextSplitter,
+                                     RecursiveCharacterTextSplitter,
+                                     TextSplitter)
 
 from src.utils.log import logger
 
+load_dotenv()  # take environment variables from .env
+hf_api_token = os.getenv("HF_API_TOKEN")
+
+
+
 # TODO: Implement DocStore
 class DocStore:
-    def __init__(self, doc_loader: BaseLoader, doc_file_exts: list[str]):
-        self.doc_loader = doc_loader
+    def __init__(self, doc_loader_cls: BaseLoader, text_splitter: TextSplitter, doc_file_exts: list[str], **kwargs: dict):
+        self.doc_loader_cls = doc_loader_cls
+        self.text_splitter = text_splitter(*kwargs)
         self.doc_file_exts = doc_file_exts
+        self.args = kwargs
 
-    def load(self, path): 
+    def load(self, path):
         pass
 
     def save(self, path):
@@ -19,7 +31,7 @@ class DocStore:
     def load_docs_from_dir(self, dir_path):
         """Load all documents from a directory and its subdirectories."""
         loaders = [
-            self.doc_loader(path)
+            self.doc_loader_cls(path)
             for path in glob(dir_path + "/**", recursive=True)
             if path.endswith(tuple(self.doc_file_exts))
         ]
@@ -28,10 +40,9 @@ class DocStore:
             docs.extend(loader.load())
         return docs
 
-    def _split_doc(self, doc):
-        """Split a document into chunks of text using langchains RecursiveCharacterTextSplitter."""
-        logger.info(f"Splitting document {doc.id} into chunks of text.")
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000, chunk_overlap=100
-        )
-        # TODO: Finish this function
+    def split_docs(self, docs):
+        """Split a list of documents into chunks of text."""
+        return [self.text_splitter.split_text(doc) for doc in docs]
+    
+
+        

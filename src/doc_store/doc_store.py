@@ -1,14 +1,11 @@
+import json
 import os
 from glob import glob
 
 from dotenv import load_dotenv
-from langchain.docstore.document import Document
 from langchain.document_loaders import UnstructuredMarkdownLoader
-from langchain.embeddings import HuggingFaceEmbeddings, HuggingFaceHubEmbeddings
-from langchain.text_splitter import (
-    MarkdownHeaderTextSplitter,
-    RecursiveCharacterTextSplitter,
-)
+from langchain.embeddings import HuggingFaceHubEmbeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from tqdm import tqdm
 
@@ -17,43 +14,44 @@ from src.utils.log import logger
 load_dotenv()  # take environment variables from .env
 
 
+CHUNK_SIZE = 1_000
+CHUNK_OVERLAP = 100
+FILE_EXTS = [".md", "mdx"]
+REPO_ID = "sentence-transformers/all-mpnet-base-v2"
+DB_PERSIST_DIR = "data/chroma"
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
 
 
-# TODO: Implement DocStore
 class DocStore:
-    def __init__(
-        self,
-        chunk_size: int = 1000,
-        chunk_overlap: int = 100,
-    ):
-        self.chunk_size = chunk_size
-        self.chunk_overlap = chunk_overlap
+    def __init__(self, **kwargs):
+        self.args = {
+            "chunk_size": kwargs.get("chunk_size", CHUNK_SIZE),
+            "chunk_overlap": kwargs.get("chunk_overlap", CHUNK_OVERLAP),
+            "file_exts": kwargs.get("file_exts", FILE_EXTS),
+            "repo_id": kwargs.get("repo_id", REPO_ID),
+            "persist_directory": kwargs.get("db_persist_dir", DB_PERSIST_DIR),
+        }
 
-        self.doc_file_exts = [".md", "mdx"]
-
-        self.doc_loader_cls = UnstructuredMarkdownLoader
+        self.doc_loader = UnstructuredMarkdownLoader
         self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
+            chunk_size=self.args["chunk_size"], chunk_overlap=self.args["chunk_overlap"]
         )
         self.embedding = HuggingFaceHubEmbeddings(
-            huggingfacehub_api_token=HF_API_TOKEN,
-            repo_id="sentence-transformers/all-mpnet-base-v2",
+            huggingfacehub_api_token=HF_API_TOKEN, repo_id=self.args["repo_id"]
         )
+        self.db = Chroma(persist_directory=self.args["persist_directory"])
 
-        self.chroma_persist_dir = "data/chroma/"
-        self.db = Chroma(
-            embedding_function=self.embedding,
-            persist_directory=self.chroma_persist_dir,
-        )
+    @classmethod
+    def load(cls, args_file):
+        return cls(**json.load(open(args_file, "r")))
 
-    def load(self, path):
-        pass
+    def save(self):
+        """Save the DocStore args to a file."""
+        # write args dict as json file
+        with open("args.json", "w") as f:
+            json.dump(self.args, f)
 
-    def save(self, path):
-        pass
-
-    def db_from_dir(self, dir_path):
+    def db_from_docs_dir(self, dir_path):
         """Load all documents from a directory and its subdirectories."""
         docs = self.load_docs_from_dir(dir_path)
         split_docs = self.text_splitter.split_documents(docs)
@@ -80,9 +78,9 @@ class DocStore:
     def load_docs_from_dir(self, dir_path):
         """Load all documents from a directory and its subdirectories."""
         loaders = [
-            self.doc_loader_cls(path)
+            self.doc_loader(path)
             for path in glob(dir_path + "/**", recursive=True)
-            if path.endswith(tuple(self.doc_file_exts))
+            if path.endswith(tuple(self.args["doc_file_exts"]))
         ]
         docs = []
         for loader in loaders:

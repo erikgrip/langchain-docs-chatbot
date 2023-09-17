@@ -9,3 +9,7 @@ pyenv install 3.11.4
 pyenv local 3.11.4
 ```
 
+Install poetry in current python version:
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```

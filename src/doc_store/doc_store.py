@@ -23,7 +23,10 @@ HF_API_TOKEN = os.getenv("HF_API_TOKEN")
 
 
 class DocStore:
+    """Document store using Chroma."""
+
     def __init__(self, **kwargs):
+        """Initialize DocStore."""
         self.args = {
             "chunk_size": kwargs.get("chunk_size", CHUNK_SIZE),
             "chunk_overlap": kwargs.get("chunk_overlap", CHUNK_OVERLAP),
@@ -46,6 +49,7 @@ class DocStore:
 
     @classmethod
     def load(cls, args_file):
+        """Instantiate from args file."""
         return cls(**json.load(open(args_file, "r")))
 
     def save(self):
@@ -62,10 +66,11 @@ class DocStore:
         logger.info("Creating Chroma database...")
         chunk_size = 50
         for i in tqdm(range(0, len(split_docs), chunk_size)):
-            self.add_docs_with_retry(split_docs[i : i + chunk_size])
-        logger.info(f"Done!")
+            chunk_end = min(i + chunk_size, len(split_docs))
+            self.add_docs_with_retry(split_docs[i:chunk_end])
+        logger.info("Done!")
 
-    def add_docs_with_retry(self, docs, max_retries=4) -> int:
+    def add_docs_with_retry(self, docs, max_retries=4):
         """Add documents to Chroma database with retry."""
         retries = 0
         try:

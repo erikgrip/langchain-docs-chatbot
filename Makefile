@@ -2,22 +2,9 @@ help:
 	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
 
 # Setup
-conda-clean-update:
-	conda env remove --name swe-motion-env
-	conda clean --yes --all --force-pkgs-dirs
-	make conda-update
-
-conda-update:
-	conda env update --prune -f environment.yml
-	echo "Now run:\nconda activate swe-motion-env"
-
-pip-sync:
-	pip-sync requirements/prod.txt requirements/dev.txt
-
-pip-tools:
-	pip install pip-tools
-	pip-compile requirements/prod.in && pip-compile requirements/dev.in
-	make pip-sync
+setup:
+	chmod +x docker/build.sh
+	sudo apt install -y g++-11
 
 
 # Training

@@ -18,7 +18,7 @@ CHUNK_SIZE = 1_000
 CHUNK_OVERLAP = 100
 FILE_EXTS = [".md", "mdx"]
 REPO_ID = "sentence-transformers/all-mpnet-base-v2"
-DB_PERSIST_DIR = "data/chroma"
+DB_PERSIST_DIR = "data/chroma/"
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
 
 
@@ -39,7 +39,10 @@ class DocStore:
         self.embedding = HuggingFaceHubEmbeddings(
             huggingfacehub_api_token=HF_API_TOKEN, repo_id=self.args["repo_id"]
         )
-        self.db = Chroma(persist_directory=self.args["persist_directory"])
+        self.db = Chroma(
+            persist_directory=self.args["persist_directory"],
+            embedding_function=self.embedding,
+        )
 
     @classmethod
     def load(cls, args_file):
@@ -57,13 +60,12 @@ class DocStore:
         split_docs = self.text_splitter.split_documents(docs)
 
         logger.info("Creating Chroma database...")
-        # Add texts to Chroma in chunks of 50 documents
         chunk_size = 50
         for i in tqdm(range(0, len(split_docs), chunk_size)):
             self.add_docs_with_retry(split_docs[i : i + chunk_size])
-        logger.info("Created Chroma database.")
+        logger.info(f"Done!")
 
-    def add_docs_with_retry(self, docs, max_retries=4):
+    def add_docs_with_retry(self, docs, max_retries=4) -> int:
         """Add documents to Chroma database with retry."""
         retries = 0
         try:
@@ -80,7 +82,7 @@ class DocStore:
         loaders = [
             self.doc_loader(path)
             for path in glob(dir_path + "/**", recursive=True)
-            if path.endswith(tuple(self.args["doc_file_exts"]))
+            if path.endswith(tuple(self.args["file_exts"]))
         ]
         docs = []
         for loader in loaders:

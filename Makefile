@@ -31,3 +31,6 @@ test:
 # Tmp
 data_pipeline:
 	PYTHONPATH=. poetry run python src/data_downloader/run.py
+
+chat:
+	PYTHONPATH=. poetry run python src/chat.py

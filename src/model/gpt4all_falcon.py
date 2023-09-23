@@ -9,7 +9,7 @@ from tqdm import tqdm
 def download_model(save_path, url):
     """Download model from url if not already downloaded."""
     if not os.path.exists(save_path):
-        with requests.get(url, stream=True) as response:
+        with requests.get(url, stream=True, timeout=5) as response:
             response.raise_for_status()
             with open(save_path, "wb") as f:
                 for chunk in tqdm(response.iter_content(chunk_size=8192)):

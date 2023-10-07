@@ -3,6 +3,7 @@ import ssl
 import nltk
 from langchain import LLMChain, PromptTemplate
 from langchain.chains import RetrievalQA
+from langchain.llms import OpenAI
 
 from src.data_downloader.run import download_repo
 from src.doc_store.doc_store import DocStore
@@ -26,7 +27,8 @@ nltk.download("punkt")
 download_repo()
 args = {"hf_repo_id": "sentence-transformers/all-mpnet-base-v2"}
 doc_store = DocStore()
-llm = get_gpt4all_falcon(max_tokens=500, streaming=True, temp=0.1)
+llm = OpenAI(temperature=0)
+
 
 
 def dummy_chain():
@@ -49,13 +51,13 @@ def dummy_chain():
 
 def run_chat(model, document_store):
     """Answer a question with document store search."""
-    question = "What is the purpose of langchain?"
+    question = "What vector store classes are currently available?"
     qa_chain = RetrievalQA.from_chain_type(
-        model, retriever=document_store.db.as_retriever()
+        model, retriever=document_store.db.as_retriever(search_kwargs={"k": 25})
     )
     answer = qa_chain({"query": question})
     print(answer)
 
 
-# doc_store.db_from_docs_dir("data/unzipped/langchain-master/docs")
+#doc_store.db_from_docs_dir("data/unzipped/langchain-master/docs")
 run_chat(llm, doc_store)

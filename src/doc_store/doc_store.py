@@ -4,7 +4,7 @@ from glob import glob
 
 from dotenv import load_dotenv
 from langchain.document_loaders import UnstructuredMarkdownLoader
-from langchain.embeddings import HuggingFaceHubEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from tqdm import tqdm
@@ -39,9 +39,7 @@ class DocStore:
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.args["chunk_size"], chunk_overlap=self.args["chunk_overlap"]
         )
-        self.embedding = HuggingFaceHubEmbeddings(
-            huggingfacehub_api_token=HF_API_TOKEN, repo_id=self.args["repo_id"]
-        )
+        self.embedding = OpenAIEmbeddings()
         self.db = Chroma(
             persist_directory=self.args["persist_directory"],
             embedding_function=self.embedding,

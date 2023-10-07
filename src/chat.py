@@ -1,9 +1,9 @@
 import ssl
 
 import nltk
-from langchain import LLMChain, PromptTemplate
-from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI
+from langchain.prompts import PromptTemplate
+from langchain.chains import RetrievalQA, LLMChain
+from langchain.llms.openai import OpenAI
 
 from src.data_downloader.run import download_repo
 from src.doc_store.doc_store import DocStore
@@ -26,7 +26,7 @@ nltk.download("punkt")
 download_repo()
 args = {"hf_repo_id": "sentence-transformers/all-mpnet-base-v2"}
 doc_store = DocStore()
-llm = OpenAI(model="gpt3.5-turbo", temperature=0)
+llm = OpenAI(temperature=0)
 
 
 def dummy_chain():

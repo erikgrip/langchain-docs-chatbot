@@ -58,17 +58,17 @@ class DocStore:
 
     def db_from_docs_dir(self, dir_path):
         """Load all documents from a directory and its subdirectories."""
-        docs = self.load_docs_from_dir(dir_path)
+        docs = self._load_docs_from_dir(dir_path)
         split_docs = self.text_splitter.split_documents(docs)
 
         logger.info("Creating Chroma database...")
         chunk_size = 50
         for i in tqdm(range(0, len(split_docs), chunk_size)):
             chunk_end = min(i + chunk_size, len(split_docs))
-            self.add_docs_with_retry(split_docs[i:chunk_end])
+            self._add_docs_with_retry(split_docs[i:chunk_end])
         logger.info("Done!")
 
-    def add_docs_with_retry(self, docs, max_retries=4):
+    def _add_docs_with_retry(self, docs, max_retries=4):
         """Add documents to Chroma database with retry."""
         retries = 0
         try:
@@ -78,9 +78,9 @@ class DocStore:
             if retries > max_retries:
                 raise
             logger.error("Failed to add documents to Chroma database. Retrying...")
-            self.add_docs_with_retry(docs)
+            self._add_docs_with_retry(docs)
 
-    def load_docs_from_dir(self, dir_path):
+    def _load_docs_from_dir(self, dir_path):
         """Load all documents from a directory and its subdirectories."""
         loaders = [
             self.doc_loader(path)

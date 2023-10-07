@@ -12,12 +12,10 @@ langchain = "^0.0.252"
 unstructured = {extras = ["md"], version = "^0.10.6"}
 python-dotenv = "^1.0.0"
 huggingface-hub = "^0.16.4"
-# https://community.render.com/t/your-system-has-an-unsupported-version-of-sqlite3-chroma-requires-sqlite3-3-35-0/13807
-chromadb = "0.3.29"
+chromadb = "^0.3.29"
 # https://github.com/oobabooga/text-generation-webui/issues/3762
 pandas = "<2.1.0"
 chroma-hnswlib = "^0.7.2"
-gpt4all = "^1.0.12"
 openai = "^0.28.1"
 tiktoken = "^0.5.1"
 lark = "^1.1.7"

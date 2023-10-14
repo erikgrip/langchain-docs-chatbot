@@ -24,7 +24,6 @@ nltk.download("punkt")
 
 
 download_repo()
-args = {"hf_repo_id": "sentence-transformers/all-mpnet-base-v2"}
 doc_store = DocStore()
 llm = OpenAI(temperature=0)
 

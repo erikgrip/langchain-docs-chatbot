@@ -8,7 +8,6 @@ from src.doc_store.doc_store import DocStore
 
 def streamlit_chatbot_app(qa_chain):
     """Run a conversation with the chatbot in a streamlit app."""
-
     st.title("Langchain Chatbot")
 
     # Initialize chat history

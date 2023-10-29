@@ -33,4 +33,4 @@ data_pipeline:
 	PYTHONPATH=. poetry run python src/data_downloader/run.py
 
 chat:
-	PYTHONPATH=. poetry run python src/chat.py
+	PYTHONPATH=. poetry run streamlit run src/app/app.py

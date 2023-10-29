@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from langchain.document_loaders import UnstructuredMarkdownLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Chroma
+from langchain.vectorstores.chroma import Chroma
 from tqdm import tqdm
 
 from src.utils.log import logger

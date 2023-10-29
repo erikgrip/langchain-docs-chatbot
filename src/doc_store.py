@@ -1,3 +1,4 @@
+# pylint: disable=unspecified-encoding
 import json
 import os
 from glob import glob

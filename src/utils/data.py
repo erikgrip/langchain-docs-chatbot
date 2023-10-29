@@ -6,18 +6,19 @@ import requests
 from src.utils.log import logger
 
 
-
-
 def download_and_unzip(url, target_extensions, force_new_download=False):
     """
-    Downloads a zip file from the given URL and extracts its contents to a target directory,
+    Download a zip file from the given URL and extracts its contents.
+
+    The contents of the zip file are extracted to atarget directory,
     filtering files by their extensions.
 
     Args:
         url (str): The URL of the zip file to download.
-        target_extensions (list[str]): A list of file extensions to extract from the zip file.
-        force_new_download (bool, optional): Whether to force a new download of the zip file,
-            even if it already exists in the local filesystem. Defaults to False.
+        target_extensions (list[str]): A list of file extensions to extract
+        from the zip file.
+        force_new_download (bool, optional): Whether to force a new download of the
+        zip file, even if it already exists in the local filesystem. Defaults to False.
 
     Returns:
         str: The path to the directory where the zip file contents were extracted.

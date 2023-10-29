@@ -1,15 +1,16 @@
 import streamlit as st
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains.base import Chain
 
-def streamlit_chatbot_app(qa_chain: ConversationalRetrievalChain):
+
+def streamlit_chatbot_app(qa_chain: Chain):
     """
-    A Streamlit app that implements a chatbot interface for a conversational retrieval model.
+    Run a Streamlit chatbot interface using a langchain retrieval chain.
 
     Parameters:
     -----------
-    qa_chain : ConversationalRetrievalChain
-        A conversational retrieval model that takes a question and a chat history as input,
-        and returns an answer as output.
+    qa_chain : Chain
+        A conversational retrieval model that takes a question and a chat history
+        as input, and returns an answer as output.
 
     Returns:
     --------

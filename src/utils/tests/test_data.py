@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.data_downloader.data_downloader import (
+from src.utils.data import (
     download_zip_file,
     extract_files_by_extension,
 )

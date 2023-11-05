@@ -1,6 +1,7 @@
 # pylint: disable=unspecified-encoding
-import json
+import logging
 import os
+import shutil
 from glob import glob
 
 from dotenv import load_dotenv
@@ -12,8 +13,9 @@ from tqdm import tqdm
 
 from src.utils.log import logger
 
-load_dotenv()  # take environment variables from .env
 
+load_dotenv()
+logging.getLogger("unstructured").setLevel(logging.WARNING)
 
 CHUNK_SIZE = 1_000
 CHUNK_OVERLAP = 100
@@ -21,12 +23,13 @@ FILE_EXTS = [".md", "mdx"]
 REPO_ID = "sentence-transformers/all-mpnet-base-v2"
 DB_PERSIST_DIR = "data/chroma/"
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
+RECREATE_DB = False
 
 
 class DocStore:
     """Document store using Chroma."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, data_path, delete_persisted_db=False, **kwargs):
         """Initialize DocStore."""
         self.args = {
             "chunk_size": kwargs.get("chunk_size", CHUNK_SIZE),
@@ -34,6 +37,7 @@ class DocStore:
             "file_exts": kwargs.get("file_exts", FILE_EXTS),
             "repo_id": kwargs.get("repo_id", REPO_ID),
             "persist_directory": kwargs.get("db_persist_dir", DB_PERSIST_DIR),
+            "recreate_db": kwargs.get("recreate_db", RECREATE_DB),
         }
 
         self.doc_loader = UnstructuredMarkdownLoader
@@ -41,21 +45,24 @@ class DocStore:
             chunk_size=self.args["chunk_size"], chunk_overlap=self.args["chunk_overlap"]
         )
         self.embedding = OpenAIEmbeddings()
+        if delete_persisted_db:
+            if os.path.exists(self.args["persist_directory"]):
+                logger.info("Removing persisted data...")
+                shutil.rmtree(self.args["persist_directory"])
+            self.create_db()
+            self.db_from_docs_dir(data_path)
+        else:
+            self.create_db()
+            if len(self.db.get(include=[])["ids"]) == 0:
+                logger.info("No documents found in database. Creating a new one...")
+                self.db_from_docs_dir(data_path)
+
+    def create_db(self):
+        """Create a new Chroma database."""
         self.db = Chroma(
             persist_directory=self.args["persist_directory"],
             embedding_function=self.embedding,
         )
-
-    @classmethod
-    def load(cls, args_file):
-        """Instantiate from args file."""
-        return cls(**json.load(open(args_file, "r")))
-
-    def save(self):
-        """Save the DocStore args to a file."""
-        # write args dict as json file
-        with open("args.json", "w") as f:
-            json.dump(self.args, f)
 
     def db_from_docs_dir(self, dir_path):
         """Load all documents from a directory and its subdirectories."""
@@ -88,7 +95,8 @@ class DocStore:
             for path in glob(dir_path + "/**", recursive=True)
             if path.endswith(tuple(self.args["file_exts"]))
         ]
+        logging.info("Loading documents...")
         docs = []
-        for loader in loaders:
+        for loader in tqdm(loaders):
             docs.extend(loader.load())
         return docs

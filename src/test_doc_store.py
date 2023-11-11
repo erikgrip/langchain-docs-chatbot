@@ -2,9 +2,11 @@
 import os
 import shutil
 import tempfile
+from unittest.mock import patch
 
 import pytest
 from langchain.docstore.document import Document
+from langchain.vectorstores.chroma import Chroma
 
 from src.doc_store import DocStore
 
@@ -21,11 +23,23 @@ class TestGroup:
         """Create a temporary DocStore."""
         with tempfile.TemporaryDirectory() as tmpdir:
             data_path = os.path.join(tmpdir, "data")
+            persist_dir = os.path.join(tmpdir, "persist_dir")
+
+            # Create a test document
             os.makedirs(data_path)
             with open(os.path.join(data_path, "test.md"), "w", encoding="utf-8") as f:
                 f.write("# Test Document\n\nThis is a test document.")
-            yield DocStore(data_path, delete_persisted_db)
-            shutil.rmtree(data_path)
+
+            # Yield the DocStore object with a mocked embedding
+            with patch(
+                "src.doc_store.OpenAIEmbeddings.embed_documents"
+            ) as mock_embedding:
+                mock_embedding.return_value = [0.0, 0.0, 0.0]
+                ds = DocStore(
+                    data_path, delete_persisted_db, db_persist_dir=persist_dir
+                )
+                yield ds
+                shutil.rmtree(tmpdir)
 
     def test_create_db(self, doc_store):
         """Test creating a new Chroma database."""
@@ -44,6 +58,5 @@ class TestGroup:
     def test_load_docs_from_dir(self, doc_store):
         """Test loading documents from a directory."""
         docs = doc_store._load_docs_from_dir(doc_store.data_path)
-        print(doc_store.args["persist_directory"])
         assert len(docs) == 1
         assert docs[0].page_content == "Test Document\n\nThis is a test document."

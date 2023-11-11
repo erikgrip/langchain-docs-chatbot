@@ -33,4 +33,8 @@ data_pipeline:
 	PYTHONPATH=. poetry run python src/data_downloader/run.py
 
 chat:
-	PYTHONPATH=. poetry run streamlit run src/app/app.py
+	PYTHONPATH=. poetry run '--' streamlit run src/app/app.py '--' --temperature 1
+# PYTHONPATH=. poetry run python src/app/app.py  --temperature=1
+
+chat_db:
+	PYTHONPATH=. poetry run '--' streamlit run src/app/app.py '--' --delete_persisted_db

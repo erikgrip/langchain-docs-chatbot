@@ -27,7 +27,7 @@ def download_and_unzip(url, target_extensions, force_new_download=False):
     output_path = "data/unzipped/"
 
     os.makedirs(output_path, exist_ok=True)
-    if not os.path.exists(path_to_downloaded_zip) and not force_new_download:
+    if not os.path.exists(path_to_downloaded_zip) or force_new_download:
         logger.info("Downloading the repository from %s.", url)
         download_zip_file(url, path_to_downloaded_zip)
     else:

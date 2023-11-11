@@ -6,7 +6,6 @@ from unittest.mock import patch
 
 import pytest
 from langchain.docstore.document import Document
-from langchain.vectorstores.chroma import Chroma
 
 from src.doc_store import DocStore
 
@@ -35,10 +34,10 @@ class TestGroup:
                 "src.doc_store.OpenAIEmbeddings.embed_documents"
             ) as mock_embedding:
                 mock_embedding.return_value = [0.0, 0.0, 0.0]
-                ds = DocStore(
+                doc_store = DocStore(
                     data_path, delete_persisted_db, db_persist_dir=persist_dir
                 )
-                yield ds
+                yield doc_store
                 shutil.rmtree(tmpdir)
 
     def test_create_db(self, doc_store):

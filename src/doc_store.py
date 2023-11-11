@@ -31,6 +31,7 @@ class DocStore:
 
     def __init__(self, data_path, delete_persisted_db=False, **kwargs):
         """Initialize DocStore."""
+        self.data_path = data_path
         self.args = {
             "chunk_size": kwargs.get("chunk_size", CHUNK_SIZE),
             "chunk_overlap": kwargs.get("chunk_overlap", CHUNK_OVERLAP),

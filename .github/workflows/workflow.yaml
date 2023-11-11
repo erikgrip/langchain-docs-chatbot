@@ -48,7 +48,9 @@ jobs:
           run: poetry install --with dev
         
         - name: Test
-          run: PYTHONPATH=. poetry run pytest
+          run: 
+            OPENAI_API_KEY="MOCK API KEY"
+            PYTHONPATH=. poetry run pytest
 
         - name: Lint
           run: poetry run bash tasks/lint.sh

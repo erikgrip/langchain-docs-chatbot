@@ -21,8 +21,8 @@ class TestGroup:
     def fixture_doc_store(self, delete_persisted_db):
         """Create a temporary DocStore."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            data_path = os.path.join(tmpdir, "data")
-            persist_dir = os.path.join(tmpdir, "persist_dir")
+            data_path = os.path.join(tmpdir, "data/")
+            persist_dir = os.path.join(tmpdir, "persist_dir/")
 
             # Create a test document
             os.makedirs(data_path)
@@ -34,9 +34,7 @@ class TestGroup:
                 "src.doc_store.OpenAIEmbeddings.embed_documents"
             ) as mock_embedding:
                 mock_embedding.return_value = [0.0, 0.0, 0.0]
-                doc_store = DocStore(
-                    data_path, delete_persisted_db, db_persist_dir=persist_dir
-                )
+                doc_store = DocStore(data_path, persist_dir, delete_persisted_db)
                 yield doc_store
                 shutil.rmtree(tmpdir)
 

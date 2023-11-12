@@ -19,37 +19,31 @@ logging.getLogger("unstructured").setLevel(logging.WARNING)
 
 CHUNK_SIZE = 1_000
 CHUNK_OVERLAP = 100
-FILE_EXTS = [".md", "mdx"]
-REPO_ID = "sentence-transformers/all-mpnet-base-v2"
-DB_PERSIST_DIR = "data/chroma/"
-HF_API_TOKEN = os.getenv("HF_API_TOKEN")
-RECREATE_DB = False
+FILE_EXTS = (".md", ".mdx")
 
 
 class DocStore:
     """Document store using Chroma."""
 
-    def __init__(self, data_path, delete_persisted_db=False, **kwargs):
+    def __init__(
+        self,
+        data_path,
+        persist_dir="data/chroma/",
+        delete_persisted_db=False,
+    ):
         """Initialize DocStore."""
         self.data_path = data_path
-        self.args = {
-            "chunk_size": kwargs.get("chunk_size", CHUNK_SIZE),
-            "chunk_overlap": kwargs.get("chunk_overlap", CHUNK_OVERLAP),
-            "file_exts": kwargs.get("file_exts", FILE_EXTS),
-            "repo_id": kwargs.get("repo_id", REPO_ID),
-            "persist_directory": kwargs.get("db_persist_dir", DB_PERSIST_DIR),
-            "recreate_db": kwargs.get("recreate_db", RECREATE_DB),
-        }
+        self.persist_dir = persist_dir
 
         self.doc_loader = UnstructuredMarkdownLoader
         self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.args["chunk_size"], chunk_overlap=self.args["chunk_overlap"]
+            chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP
         )
         self.embedding = OpenAIEmbeddings()
         if delete_persisted_db:
-            if os.path.exists(self.args["persist_directory"]):
+            if os.path.exists(self.persist_dir):
                 logger.info("Removing persisted data...")
-                shutil.rmtree(self.args["persist_directory"])
+                shutil.rmtree(self.persist_dir)
             self.create_db()
             self.db_from_docs_dir(data_path)
         else:
@@ -61,7 +55,7 @@ class DocStore:
     def create_db(self):
         """Create a new Chroma database."""
         self.db = Chroma(
-            persist_directory=self.args["persist_directory"],
+            persist_directory=self.persist_dir,
             embedding_function=self.embedding,
         )
 
@@ -94,7 +88,7 @@ class DocStore:
         loaders = [
             self.doc_loader(path)
             for path in glob(dir_path + "/**", recursive=True)
-            if path.endswith(tuple(self.args["file_exts"]))
+            if path.endswith(FILE_EXTS)
         ]
         logging.info("Loading documents...")
         docs = []

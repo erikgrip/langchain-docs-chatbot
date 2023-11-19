@@ -4,11 +4,10 @@
 poetry export -f requirements.txt --output docker/requirements.txt --without-hashes
 
 # Build docker image
-docker build -t langchain-docs-chatbot ./docker
+docker  build -t langchain-docs-chatbot -f ./docker/Dockerfile .
 
-# Run docker image
-docker run --rm -p 5005:5005 langchain-docs-chatbot
+# Run docker image and add data/ directory as volume
+docker run --rm -p 8501:8501 -v ./data:/data --env-file .env langchain-docs-chatbot 
 
 # Remove dependencies
-rm ./requirements.txt
-
+rm ./docker/requirements.txt

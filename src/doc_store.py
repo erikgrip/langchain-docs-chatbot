@@ -44,32 +44,26 @@ class DocStore:
             if os.path.exists(self.persist_dir):
                 logger.info("Removing persisted data...")
                 shutil.rmtree(self.persist_dir)
-            self.create_db()
-            self.db_from_docs_dir(data_path)
-        else:
-            self.create_db()
-            if len(self.db.get(include=[])["ids"]) == 0:
-                logger.info("No documents found in database. Creating a new one...")
-                self.db_from_docs_dir(data_path)
 
-    def create_db(self):
-        """Create a new Chroma database."""
         self.db = Chroma(
             persist_directory=self.persist_dir,
             embedding_function=self.embedding,
         )
+        if self.is_empty():
+            logger.info("No documents found in database. Creating a new one...")
+            self._db_from_docs_dir(self.data_path)
 
-    def db_from_docs_dir(self, dir_path):
-        """Load all documents from a directory and its subdirectories."""
-        docs = self._load_docs_from_dir(dir_path)
-        split_docs = self.text_splitter.split_documents(docs)
+    def is_empty(self):
+        """Check if the database is empty."""
+        return len(self.db.get(include=[])["ids"]) == 0
 
-        logger.info("Creating Chroma database...")
-        chunk_size = 50
-        for i in tqdm(range(0, len(split_docs), chunk_size)):
-            chunk_end = min(i + chunk_size, len(split_docs))
-            self.add_docs(split_docs[i:chunk_end])
-        logger.info("Done!")
+    def size(self):
+        """Return the size of the database."""
+        return len(self.db.get(include=[])["ids"])
+
+    def as_retriever(self, num_retrieved_docs):
+        """Return the database as a retriever."""
+        return self.db.as_retriever(search_kwargs={"k": num_retrieved_docs})
 
     def add_docs(self, docs, max_retries=4):
         """Add documents to Chroma database with retry."""
@@ -82,6 +76,18 @@ class DocStore:
                 raise
             logger.error("Failed to add documents to Chroma database. Retrying...")
             self.add_docs(docs)
+
+    def _db_from_docs_dir(self, dir_path):
+        """Load all documents from a directory and its subdirectories."""
+        docs = self._load_docs_from_dir(dir_path)
+        split_docs = self.text_splitter.split_documents(docs)
+
+        logger.info("Creating Chroma database...")
+        chunk_size = 50
+        for i in tqdm(range(0, len(split_docs), chunk_size)):
+            chunk_end = min(i + chunk_size, len(split_docs))
+            self.add_docs(split_docs[i:chunk_end])
+        logger.info("Done!")
 
     def _load_docs_from_dir(self, dir_path):
         """Load all documents from a directory and its subdirectories."""

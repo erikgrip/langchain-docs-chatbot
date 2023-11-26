@@ -40,17 +40,13 @@ class TestGroup:
 
     def test_create_db(self, doc_store):
         """Test creating a new Chroma database."""
-        assert doc_store.db is not None
-
-    def test_db_from_docs_dir(self, doc_store):
-        """ "Make sure the index has expected size."""
-        assert len(doc_store.db.get(include=[])["ids"]) == 1
+        assert doc_store.size() == 1
 
     def test_add_docs_with_retry(self, doc_store):
         """Test adding documents to Chroma database with retry."""
         docs = [Document(page_content="Test document.", metadata={"id": "test_doc"})]
         doc_store.add_docs(docs)
-        assert len(doc_store.db.get(include=[])["ids"]) == 2
+        assert doc_store.size() == 2
 
     def test_load_docs_from_dir(self, doc_store):
         """Test loading documents from a directory."""

@@ -43,9 +43,9 @@ if __name__ == "__main__":
     data_path = download_and_unzip(
         REPO_ZIP_URL, TARGET_EXTENSIONS, args.force_data_download
     )
-    doc_store = DocStore(data_path, args.delete_persisted_db)
+    doc_store = DocStore(data_path, delete_persisted_db=args.delete_persisted_db)
     llm = OpenAI(temperature=args.temperature)
-    retriever = doc_store.db.as_retriever(search_kwargs={"k": args.num_retrieved_docs})
+    retriever = doc_store.as_retriever(args.num_retrieved_docs)
     chain = ConversationalRetrievalChain.from_llm(
         llm,
         retriever=retriever,

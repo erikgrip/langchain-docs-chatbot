@@ -49,13 +49,33 @@ class DocStore:
             persist_directory=self.persist_dir,
             embedding_function=self.embedding,
         )
-        if len(self.db.get(include=[])["ids"]) == 0:
+        if self.is_empty():
             logger.info("No documents found in database. Creating a new one...")
             self._db_from_docs_dir(self.data_path)
+
+    def is_empty(self):
+        """Check if the database is empty."""
+        return len(self.db.get(include=[])["ids"]) == 0
+
+    def size(self):
+        """Return the size of the database."""
+        return len(self.db.get(include=[])["ids"])
 
     def as_retriever(self, num_retrieved_docs):
         """Return the database as a retriever."""
         return self.db.as_retriever(search_kwargs={"k": num_retrieved_docs})
+
+    def add_docs(self, docs, max_retries=4):
+        """Add documents to Chroma database with retry."""
+        retries = 0
+        try:
+            self.db.add_documents(docs)
+        except KeyError:
+            retries += 1
+            if retries > max_retries:
+                raise
+            logger.error("Failed to add documents to Chroma database. Retrying...")
+            self.add_docs(docs)
 
     def _db_from_docs_dir(self, dir_path):
         """Load all documents from a directory and its subdirectories."""
@@ -66,20 +86,8 @@ class DocStore:
         chunk_size = 50
         for i in tqdm(range(0, len(split_docs), chunk_size)):
             chunk_end = min(i + chunk_size, len(split_docs))
-            self._add_docs(split_docs[i:chunk_end])
+            self.add_docs(split_docs[i:chunk_end])
         logger.info("Done!")
-
-    def _add_docs(self, docs, max_retries=4):
-        """Add documents to Chroma database with retry."""
-        retries = 0
-        try:
-            self.db.add_documents(docs)
-        except KeyError:
-            retries += 1
-            if retries > max_retries:
-                raise
-            logger.error("Failed to add documents to Chroma database. Retrying...")
-            self._add_docs(docs)
 
     def _load_docs_from_dir(self, dir_path):
         """Load all documents from a directory and its subdirectories."""

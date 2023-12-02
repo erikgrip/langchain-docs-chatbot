@@ -28,7 +28,7 @@ class DocStore:
     def __init__(
         self,
         data_path,
-        persist_dir="data/chroma/",
+        persist_dir="data/chroma",
         delete_persisted_db=False,
     ):
         """Initialize DocStore."""
@@ -45,6 +45,7 @@ class DocStore:
                 logger.info("Removing persisted data...")
                 shutil.rmtree(self.persist_dir)
 
+        logger.info("Initializing Chroma database...")
         self.db = Chroma(
             persist_directory=self.persist_dir,
             embedding_function=self.embedding,
@@ -60,6 +61,11 @@ class DocStore:
     def size(self):
         """Return the size of the database."""
         return len(self.db.get(include=[])["ids"])
+
+    def persist(self):
+        """Persist the database."""
+        logger.info("Writing Chroma database to disk (%s)...", self.persist_dir)
+        self.db.persist()
 
     def as_retriever(self, num_retrieved_docs):
         """Return the database as a retriever."""
@@ -82,7 +88,7 @@ class DocStore:
         docs = self._load_docs_from_dir(dir_path)
         split_docs = self.text_splitter.split_documents(docs)
 
-        logger.info("Creating Chroma database...")
+        logger.info("Loading Chroma database from %s...", dir_path)
         chunk_size = 50
         for i in tqdm(range(0, len(split_docs), chunk_size)):
             chunk_end = min(i + chunk_size, len(split_docs))

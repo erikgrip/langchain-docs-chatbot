@@ -1,8 +1,17 @@
 import streamlit as st
-from langchain.chains.base import Chain
+from langchain.chains import ConversationalRetrievalChain
+from langchain.llms.openai import OpenAI
+
+from src.doc_store import DocStore
+from src.utils.data import download_and_unzip
+
+REPO_ZIP_URL = "https://github.com/langchain-ai/langchain/archive/refs/heads/master.zip"
+TARGET_EXTENSIONS = [".md", ".mdx"]
 
 
-def streamlit_chatbot_app(qa_chain: Chain):
+def streamlit_chatbot_app(
+    force_data_download, delete_persisted_db, num_retrieved_docs, temperature
+):
     """
     Run a Streamlit chatbot interface using a langchain retrieval chain.
 
@@ -19,7 +28,28 @@ def streamlit_chatbot_app(qa_chain: Chain):
     st.title("Langchain Chatbot")
 
     # Initialize chat history
-    if "messages" not in st.session_state or not st.session_state.messages:
+    if not st.session_state.get("started"):
+        with st.status("Preparing document store..."):
+            st.write("Downloading data...")
+            data_path = download_and_unzip(
+                REPO_ZIP_URL, TARGET_EXTENSIONS, force_data_download
+            )
+            st.write("Initializing document store...")
+            doc_store = DocStore(data_path, delete_persisted_db=delete_persisted_db)
+            st.write("Persisting document store...")
+            doc_store.persist()
+
+            llm = OpenAI(temperature=temperature)
+            retriever = doc_store.as_retriever(num_retrieved_docs)
+            st.session_state["qa_chain"] = ConversationalRetrievalChain.from_llm(
+                llm,
+                retriever=retriever,
+                return_source_documents=True,
+                return_generated_question=True,
+            )
+            st.session_state["started"] = True
+
+    if not st.session_state.get("chat_history"):
         st.session_state.messages = []
         st.session_state.chat_history = []
 
@@ -41,7 +71,7 @@ def streamlit_chatbot_app(qa_chain: Chain):
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             message_placeholder.markdown("▌")
-            result = qa_chain(
+            result = st.session_state["qa_chain"](
                 {"question": question, "chat_history": st.session_state.chat_history}
             )
             message_placeholder.markdown(result["answer"])

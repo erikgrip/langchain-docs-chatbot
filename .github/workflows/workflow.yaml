@@ -50,7 +50,7 @@ jobs:
         - name: Test
           run: 
             OPENAI_API_KEY="MOCK API KEY"
-            PYTHONPATH=. poetry run pytest
+            poetry run bash tasks/test.sh
 
         - name: Lint
           run: poetry run bash tasks/lint.sh

@@ -31,6 +31,9 @@ if __name__ == "__main__":
     if args.force_data_download and not args.delete_persisted_db:
         logger.warning("Downloading data without recreating any peristed database.")
 
+    logger.info("Starting Streamlit chatbot app...")
+    logger.info("args: %s", args)
+
     streamlit_chatbot_app(
         args.force_data_download,
         args.delete_persisted_db,

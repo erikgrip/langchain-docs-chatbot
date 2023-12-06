@@ -53,4 +53,5 @@ if [ -n "$temperature" ]; then
 fi
 
 # Run docker image and add data/ directory as volume
-docker run --rm -p 8501:8501 -v ./data:/data --env-file .env langchain-docs-chatbot $app_args
+# shellcheck disable=SC2086
+docker run --rm -p 8501:8501 -v ./data:/data --env-file .env langchain-docs-chatbot $app_args  

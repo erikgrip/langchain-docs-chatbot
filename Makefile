@@ -3,22 +3,7 @@ help:
 
 # Setup
 setup:
-	chmod +x docker/build.sh
-	sudo apt install -y g++-11
-
-
-# Training
-train-help:
-	PYTHONPATH=. python training/run_experiment.py --help
-
-train-overfit:
-	PYTHONPATH=. python training/run_experiment.py --max_epochs=300 --data_class=MotionsDataModule --model_class=MT5 --overfit_batches=1 --lr=0.001 --early_stopping=50
-
-train-dev-run:
-	PYTHONPATH=. python training/run_experiment.py --max_epochs=2 --data_class=MotionsDataModule --model_class=MT5 --fast_dev_run=True  --data_frac=0.001
-
-tensorboard:
-	tensorboard --logdir training/logs/lightning_logs
+	chmod +x docker/run.sh
 
 # Testing and linting
 lint:

@@ -1,6 +1,7 @@
 ### Project Settings ###
 .python-version
 
+Makefile
 data/
 .vscode/
 

@@ -31,7 +31,7 @@ do
     esac
 done
 
-# Build docker image if --build flag is passed or if it doesn't exist
+# Build docker image if --build flag is passed or if image doesn't exist
 if [ "$build" = true ] || [ ! "$(docker images -q langchain-docs-chatbot 2> /dev/null)" ]; then
     poetry export -f requirements.txt --output docker/requirements.txt --without-hashes
     docker build -t langchain-docs-chatbot -f ./docker/Dockerfile .
@@ -52,5 +52,5 @@ if [ -n "$temperature" ]; then
     app_args+=" --temperature $temperature"
 fi
 
-# Run docker image and add data/ directory as volume
-docker run --rm -p 8501:8501 -v ./data:/data --env-file .env langchain-docs-chatbot $app_args
+# shellcheck disable=SC2086
+docker run --rm -p 8501:8501 -v ./data:/data --env-file .env langchain-docs-chatbot $app_args  

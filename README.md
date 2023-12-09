@@ -2,6 +2,10 @@
 
 Create a chatbot app to answer questions about langchain based on the langchain documentation.
 
+
+https://github.com/erikgrip/langchain_docs_chatbot/assets/72067855/31d326f9-2c31-4395-81a9-688ab6e2e7cb
+
+
 ## Table of contents
 
 - [General info](#general-info)

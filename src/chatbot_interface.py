@@ -25,7 +25,7 @@ def streamlit_chatbot_app(
     --------
     None
     """
-    st.title("Langchain Chatbot")
+    st.title("🦜️🔗 Langchain Docs Chatbot 🤖")
 
     # Initialize chat history
     if not st.session_state.get("started"):

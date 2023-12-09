@@ -2,10 +2,6 @@
 
 Create a chatbot app to answer questions about langchain based on the langchain documentation.
 
-
-https://github.com/erikgrip/langchain_docs_chatbot/assets/72067855/31d326f9-2c31-4395-81a9-688ab6e2e7cb
-
-
 ## Table of contents
 
 - [General info](#general-info)
@@ -29,11 +25,7 @@ This is a project to build a chatbot app, that can answer questions about the py
 
 What interaction with the app looks like:
 
-![](resources/app_demo.mp4)
-
-<video width="500" height="500" controls>
-  <source src="resources/app_demo.mp4" type="video/mp4">
-</video>
+https://github.com/erikgrip/langchain_docs_chatbot/assets/72067855/31d326f9-2c31-4395-81a9-688ab6e2e7cb
 
 ## Technologies
 

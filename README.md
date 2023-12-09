@@ -25,6 +25,8 @@ This is a project to build a chatbot app, that can answer questions about the py
 
 What interaction with the app looks like:
 
+![](resources/app_demo.mp4)
+
 <video width="500" height="500" controls>
   <source src="resources/app_demo.mp4" type="video/mp4">
 </video>

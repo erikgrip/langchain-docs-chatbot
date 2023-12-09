@@ -25,7 +25,8 @@ This is a project to build a chatbot app, that can answer questions about the py
 
 What interaction with the app looks like:
 
-https://github.com/erikgrip/langchain_docs_chatbot/assets/72067855/31d326f9-2c31-4395-81a9-688ab6e2e7cb
+https://github.com/erikgrip/langchain_docs_chatbot/assets/72067855/4afc714e-9287-47e5-84f3-16e2f05766da
+
 
 ## Technologies
 

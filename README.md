@@ -11,7 +11,7 @@ Create a chatbot app to answer questions about langchain based on the langchain 
 
 ## General info
 
-This is a project to build a chatbot app, that can answer questions about the python package langchain. The app was built using OpenAI's GPT4 in the autumn of 2023. Even though the model itself was not aware of langchain at the time, due to its lknowledge cutoff, the app can search information about langchain from a vector store that is loaded with the markdown filea from langchain's Github repository.
+This project involves creating a chatbot application capable of answering questions about the Python package LangChain. Built using OpenAI's GPT-4 in the autumn of 2023, the app compensates for the model's knowledge cutoff regarding LangChain by searching a vector store populated with markdown files from LangChain's GitHub repository.
 
 > **User:**
 >
